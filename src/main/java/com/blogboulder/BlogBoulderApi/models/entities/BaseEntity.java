@@ -2,9 +2,7 @@ package com.blogboulder.BlogBoulderApi.models.entities;
 
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.domain.Persistable;
 
 import java.util.Date;
 
@@ -20,13 +18,6 @@ public class BaseEntity {
 	private Date deletedDate;
 
 	private boolean active = true;
-
-	public BaseEntity(String id) {
-		this.id = id;
-	}
-
-	public BaseEntity() {
-	}
 
 	public Date getCreatedDate() {
 		return createdDate;

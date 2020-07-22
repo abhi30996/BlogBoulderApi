@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/blog")
 public class BlogController {
 
-	private BlogService blogService;
+	private final BlogService blogService;
 
 	@Autowired
 	public BlogController(BlogService blogService) {

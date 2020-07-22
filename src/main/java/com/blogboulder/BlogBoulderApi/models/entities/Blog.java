@@ -2,8 +2,6 @@ package com.blogboulder.BlogBoulderApi.models.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.UUID;
-
 /**
  * Entity class for Blog data.
  *

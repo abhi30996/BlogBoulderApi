@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class BlogService {
 
-	private BlogRepository blogRepository;
-	private UserRepository userRepository;
-	private MapperFacade mapperFacade;
+	private final BlogRepository blogRepository;
+	private final UserRepository userRepository;
+	private final MapperFacade mapperFacade;
 
 	@Autowired
 	public BlogService(BlogRepository blogRepository, UserRepository userRepository, MapperFacade mapperFacade) {
@@ -36,11 +36,11 @@ public class BlogService {
 	//Create
 
 	@Transactional
-	public ResponseEntity<?> addBlog(BlogDto blogDto){
-		if(TextUtils.isEmpty(blogDto.getContent()) || TextUtils.isEmpty(blogDto.getUserId()))
+	public ResponseEntity<?> addBlog(BlogDto blogDto) {
+		if (TextUtils.isNullOrEmpty(blogDto.getContent()) || TextUtils.isNullOrEmpty(blogDto.getUserId()))
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		User user = userRepository.findById(blogDto.getUserId()).orElse(null);
-		if(user == null)
+		if (user == null)
 			return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
 		Blog blog = blogDto.toModel(Blog.class, mapperFacade);
 		blogRepository.save(blog);
@@ -51,41 +51,50 @@ public class BlogService {
 
 	@Transactional
 	public ResponseEntity<?> editBlog(BlogDto blogDto) {
-		if(TextUtils.isEmpty(blogDto.getId()) || TextUtils.isEmpty(blogDto.getUserId()))
+		if (TextUtils.isNullOrEmpty(blogDto.getId()) || TextUtils.isNullOrEmpty(blogDto.getUserId()))
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		User user = userRepository.findById(blogDto.getUserId()).orElse(null);
-		if(user==null)
+		if (user == null)
 			return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
 		Blog blog = blogRepository.findById(blogDto.getId()).orElse(null);
-		if(blog == null)
+		if (blog == null)
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		if(!blog.getUserId().equals(user.getId()))
+			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		blog.setContent(blogDto.getContent());
 		blogRepository.save(blog);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	//Read
 
-	public ResponseEntity<?> fetchAllBlogs(){
+	public ResponseEntity<?> fetchAllBlogs() {
 		List<Blog> blogs = blogRepository.findAllByAndDeletedDateIsNull();
-		if(CollectionUtils.isEmpty(blogs))
+		if (CollectionUtils.isEmpty(blogs))
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		return ResponseEntity.ok(blogs.stream().filter(Objects::nonNull).map(obj -> obj.toDTO(BlogDto.class, mapperFacade)).collect(Collectors.toList()));
 	}
 
 	// Delete
 
-	public ResponseEntity<?> deleteBlog(BlogDto blogDto){
-		if(TextUtils.isEmpty(blogDto.getId()) || TextUtils.isEmpty(blogDto.getUserId()))
+	public ResponseEntity<?> deleteBlog(BlogDto blogDto) {
+		if (TextUtils.isNullOrEmpty(blogDto.getId()) || TextUtils.isNullOrEmpty(blogDto.getUserId()))
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		User user = userRepository.findById(blogDto.getUserId()).orElse(null);
-		if(user==null)
-			return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+
 		Blog blog = blogRepository.findByIdAndDeletedDateIsNull(blogDto.getId());
-		if(blog == null)
+		if (blog == null)
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+		User user = userRepository.findById(blogDto.getUserId()).orElse(null);
+		if (user == null)
+			return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+
+		if (!blog.getUserId().equals(user.getId()))
+			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
 		blog.setDeletedDate(new Date());
 		blogRepository.save(blog);
-		return new ResponseEntity(HttpStatus.OK);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

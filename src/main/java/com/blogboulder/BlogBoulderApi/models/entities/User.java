@@ -2,8 +2,6 @@ package com.blogboulder.BlogBoulderApi.models.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.UUID;
-
 /**
  * Entity class for User model.
  *
@@ -29,6 +27,7 @@ public class User extends BaseEntity{
 
 	private boolean verified;
 
+	@SuppressWarnings("unused")
 	public User() {
 	}
 
