@@ -75,6 +75,13 @@ public class BlogService {
 		return ResponseEntity.ok(blogs.stream().filter(Objects::nonNull).map(obj -> obj.toDTO(BlogDto.class, mapperFacade)).collect(Collectors.toList()));
 	}
 
+	public ResponseEntity<?> fetchBlog(String blogId) {
+		Blog blog = blogRepository.findByIdAndDeletedDateIsNull(blogId);
+		if (blog == null)
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return ResponseEntity.ok(blog.toDTO(BlogDto.class, mapperFacade));
+	}
+
 	// Delete
 
 	public ResponseEntity<?> deleteBlog(BlogDto blogDto) {

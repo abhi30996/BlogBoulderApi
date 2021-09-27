@@ -7,9 +7,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @EnableMongoAuditing
 @SpringBootApplication
 public class BlogBoulderApiApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(BlogBoulderApiApplication.class, args);
 	}
-
 }
